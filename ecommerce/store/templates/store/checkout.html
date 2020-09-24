@@ -75,7 +75,7 @@
             {% endfor %}
 
             <h5>Items: {{order.get_cart_items}}</h5>
-            <h5>Total: ${{order.get_cart_total}}</h5>
+            <h5>Total: ${{order.get_cart_total|floatformat:2}}</h5>
 
 
         </div>
@@ -165,7 +165,12 @@
         .then((response)=>{return response.json()})
         .then((data)=>{
             console.log('Success:',data);
+
             alert('Transaction Completed');
+
+            cart = {}
+            document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
             window.location.href = "{% url 'store' %}"
         })
 
