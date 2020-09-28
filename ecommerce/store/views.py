@@ -9,7 +9,133 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
 from . utils import cookieCart, cartData, guestOrder
+import requests
+
 # Create your views here.
+
+
+def otp(request):
+    if request.method == 'GET':
+        phone = request.COOKIES['mobile']
+        print(phone)
+        user = User.objects.filter(last_name = phone).exists()
+        print(user)
+        if not user:
+            messages.info(request,'Mobile number invalid')
+            return redirect('mobile')
+            
+        url = "https://d7networks.com/api/verifier/send"
+
+        num = str(91)+phone
+
+        payload = {'mobile': num,
+        'sender_id': 'SMSINFO',
+        'message': 'Your otp code is {code}',
+        'expiry': '900'}
+        files = [
+
+        ]
+        headers = {
+        'Authorization': 'Token 3202b5c476f743ea70714e6e31e62c17fdad14b0'
+        }
+
+        response = requests.request("POST", url, headers=headers, data = payload, files = files)
+
+        print(response.text.encode('utf8'))
+        otp_id = response.text[11:47] 
+        print(otp_id)                                                          
+        responce  = render(request, 'store/otp.html')
+        responce.set_cookie('otp_id', otp_id)
+        return responce
+    else:
+
+        otp = request.POST.get('otp')
+        print(otp)
+
+        otp_id = request.COOKIES['otp_id']
+
+        url = "https://d7networks.com/api/verifier/verify"
+
+        payload = {'otp_id': otp_id,
+        'otp_code': otp}
+        files = [
+
+        ]
+        headers = {
+        'Authorization': 'Token 3202b5c476f743ea70714e6e31e62c17fdad14b0'
+        }
+
+        response = requests.request("POST", url, headers=headers, data = payload, files = files)
+
+        b = json.loads(response.text)
+        try:
+            print(b["status"])
+        except:
+            b["status"] = 'failed'
+            print(b["status"])
+        if (b["status"] == "success"):
+            phone = request.COOKIES['mobile']
+            user = User.objects.get(last_name = phone )
+            print(user)
+            username = user.username
+            password = user.first_name
+            print(password)
+            print(username)
+            user = auth.authenticate(request, username = username, password = password)
+            print(user)
+            if user is not None:
+                auth.login(request,user)
+                print('login request')
+                return redirect('store')
+            else:
+                messages.info(request, 'OTP did not match')
+                return redirect('mobile')
+        print(response.text.encode('utf8'))
+        messages.info(request, 'OTP did not match')
+        return redirect('mobile')
+
+
+def verify(request):
+    if request.method == 'GET':
+        url = "https://d7networks.com/api/verifier/verify"
+
+        payload = {'otp_id': 'dca7f26e-240c-4262-a255-41bb4c967e38',
+        'otp_code': '937786'}
+        files = [
+
+        ]
+        headers = {
+        'Authorization': 'Token 3202b5c476f743ea70714e6e31e62c17fdad14b0'
+        }
+
+        response = requests.request("POST", url, headers=headers, data = payload, files = files)
+        b = json.loads(response.text)
+        print(b["status"])
+        if (b["status"] == "success"):
+            phone = request.COOKIES['mobile']
+            user = User.objects.get(last_name = phone )
+            user = auth.authenticate(request, last_name = phone)
+
+            if user is not None:
+                auth.login(request,user)
+                print('login request')
+                return redirect('store')
+            else:
+                messages.info(request, 'Invalid credentials')
+
+        print(response.text.encode('utf8'))
+        return render(request, 'store/otp.html')
+    return render(request, 'store/otp.html')
+        
+def mobile(request):
+    if request.method == 'POST':
+        mobile = request.POST.get('mobile')
+        print(mobile)
+        responce = redirect('otp')
+        responce.set_cookie('mobile', mobile)
+        return responce
+
+    return render(request, 'store/mobile.html')
 
 def login(request):
 
@@ -37,17 +163,38 @@ def logout (request):
     return redirect('store')
 
 def register(request):
-    form = CreateUserForm()
+     if request.method == 'POST':  
 
-    if request.method == 'POST':
-        form = CreateUserForm(request.POST)
-        print(form)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
+        username = request.POST['username']
+        email = request.POST['email']
+        mobile = request.POST['mobile']
+        password1 = request.POST['password']
+        password2 = request.POST['password0']
+        
 
-    context = {'form':form}
-    return render(request, 'store/register.html', context)
+        if password1==password2 :
+            if User.objects.filter(username=username).exists():
+                messages.info(request, 'Username taken')
+                return render(request, 'store/register.html')
+            elif User.objects.filter(email=email).exists():
+                messages.info(request, 'email taken')
+                return render(request, 'store/register.html')
+            elif User.objects.filter(last_name=mobile).exists():
+                messages.info(request, 'email taken')
+                return render(request, 'store/register.html')
+            else:    
+                user = User.objects.create_user(username = username, password = password1, email = email,first_name = password1, last_name = mobile)
+                user.save();
+                print('User created')
+                return redirect('login')
+                
+        else:
+            messages.info(request, 'password not matching')       
+            return render(request, 'store/register.html')
+       
+
+     else:
+        return render(request, 'store/register.html')
 
 def store(request):
 
@@ -91,6 +238,8 @@ def checkout(request):
 
     context = {'items': items, 'order':order, 'cartItems':cartItems}
     return render(request, 'store/checkout.html', context)
+
+
 
 def updateItem(request):
     data = json.loads(request.body)
@@ -177,11 +326,10 @@ def product(request, pk):
         cart = {}
         print('cart:', cart)  
         items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
-        cartItems = order['get_cart_items']
-        for i in cart:
-            cartItems += cart[i]['quantity']
-     
+    order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
+    cartItems = order['get_cart_items']
+    for i in cart:
+        cartItems += cart[i]['quantity']   
     product = Product.objects.get(id=pk)
     context = {'product': product, 'cartItems':cartItems}
  

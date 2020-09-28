@@ -75,31 +75,41 @@
 				</div>
 				<div class="d-flex justify-content-center form_container">
 
-					<form method="POST" action="">
+					<form method="POST" action="" onsubmit="return verify()">
                         {% csrf_token %}
 						<div class="input-group mb-3">
 							<div class="input-group-append">
 								<span class="input-group-text"><i class="fas fa-user"></i></span>
 							</div>
-							{{form.username}}
+							<input  name="username" type="text" required="true" >
+
 						</div>
 						<div class="input-group mb-2">
 							<div class="input-group-append">
 								<span class="input-group-text"><i class="fas fa-envelope-square"></i></span>
 							</div>
-							{{form.email}}
+							<input  name="email" type="email" required="true" >
+						</div>
+						<div class="input-group mb-3">
+							<div class="input-group-append">
+								<span class="input-group-text"><i class="fas fa-user"></i></span>
+							</div>
+							<input  name="mobile" type="text" required="true" >
+						</div>
+
+						<div class="input-group mb-2">
+							<div class="input-group-append">
+								<span class="input-group-text"><i class="fas fa-key"></i></span>
+							</div>
+							<input id="password" name="password" type="password" required="true" onkeyup="">
+
 						</div>
 						<div class="input-group mb-2">
 							<div class="input-group-append">
 								<span class="input-group-text"><i class="fas fa-key"></i></span>
 							</div>
-							{{form.password1}}
-						</div>
-						<div class="input-group mb-2">
-							<div class="input-group-append">
-								<span class="input-group-text"><i class="fas fa-key"></i></span>
-							</div>
-							{{form.password2}}
+							<input id="password0"  name="password0" type="password" required="true" onkeyup="check();">
+
 						</div>
 
 				   		<div class="d-flex justify-content-center mt-3 login_container">
@@ -107,8 +117,11 @@
 				   		</div>
 					</form>
 				</div>
+				<span id="message"></span>
                 
-                {{form.errors}}
+				{% for message in messages %}
+				<h3 style="color: red;">{{message}}</h3>
+				{% endfor %}
 
 				<div class="mt-4">
 					<div class="d-flex justify-content-center links">
@@ -118,8 +131,37 @@
 			</div>
 		</div>
 	</div>
+
+
+
 	<script>
-						/* Because i didnt set placeholder values in forms.py they will be set here using vanilla Javascript
+		var check = function() {
+	  if (document.getElementById('password').value ==  document.getElementById('password0').value) {
+		document.getElementById('message').style.color = 'white';
+		document.getElementById('message').innerHTML = 'matching';
+	  } else {
+		document.getElementById('message').style.color = 'red';
+		document.getElementById('message').innerHTML = 'passwords not matching';
+	  }
+	}
+
+	
+	</script>
+	<script>
+		function verify(){
+	
+			var pwd1 = document.getElementById("password").value;
+			var pwd2 = document.getElementById("password0").value;
+			if (pwd1 != pwd2){
+				//alert(" Both Passwords are not matching !!")
+				return false
+		}
+		}
+	</script>
+	
+
+	<script>
+		/* Because i didnt set placeholder values in forms.py they will be set here using vanilla Javascript
 		//We start indexing at one because CSRF_token is considered and input field 
 		 */
 
@@ -127,8 +169,9 @@
 		var form_fields = document.getElementsByTagName('input')
 		form_fields[1].placeholder='Username..';
 		form_fields[2].placeholder='Email..';
-		form_fields[3].placeholder='Enter password...';
-		form_fields[4].placeholder='Re-enter Password...';
+		form_fields[3].placeholder='Mobile number..';
+		form_fields[4].placeholder='Enter password...';
+		form_fields[5].placeholder='Re-enter Password...';
 
 
 		for (var field in form_fields){	
@@ -137,7 +180,6 @@
 	</script>
 </body>
 </html>
-
 
 
 

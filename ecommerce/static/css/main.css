@@ -97,3 +97,31 @@ h1,h2,h3,h4,h5,h6{
 .hidden{
 	display: none!important;
 }
+
+#featured{
+	/* margin-top: 45px; */
+	max-width: 500px;
+	max-height: 600px;
+
+	cursor:pointer;
+	border: 2px solid black;
+}
+
+#img-container{
+	margin-top: 40px;
+	z-index: 1;
+	position: relative;
+
+	max-width: 500px;
+}
+
+#lens{
+	z-index: 2;
+	position: absolute;
+
+	height:125px;
+	width: 125px;
+	border: .5px solid black;
+	background-repeat: no-repeat;
+	cursor:none;
+}

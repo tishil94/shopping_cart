@@ -8,8 +8,9 @@
 
         {% for product in products %}
         <div class="col-lg-4">
-            <img class="thumbnail" src="{{product.imageURL}}" alt="">
-            <div class="box-element product" >
+            <button style="text-decoration: none; border:none " data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart" ><img style="text-decoration: none;" class="thumbnail" src="{{product.imageURL}}" alt=""></button>
+            
+            <div class="box-element product" style="margin: 10px;" >
                 <h6><strong>{{product.name}}</strong></h6>
                 <hr>
                 <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart" >Add to Cart</button>
