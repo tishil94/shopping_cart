@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User,auth
 from . utils import cookieCart, cartData, guestOrder
 import requests
+import razorpay
 
 # Create your views here.
 
@@ -198,7 +199,13 @@ def register(request):
 
 def store(request):
 
-    if request.user.is_authenticated:
+    if request.user.is_superuser:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+
+    elif request.user.is_authenticated:
 
         login_user = request.user
         login_name = request.user.username
@@ -231,12 +238,40 @@ def cart(request):
 
 def checkout(request):
 
+    url = "https://restcountries-v1.p.rapidapi.com/all"
+
+    headers = {
+        'x-rapidapi-host': "restcountries-v1.p.rapidapi.com",
+        'x-rapidapi-key': "3b2ed275fbmsh21f27fe96f38688p182fedjsna34ff216cf39"
+        }
+
+    response = requests.request("GET", url, headers=headers)
+
+    c = json.loads(response.text)
+    print(c[0]["name"])
+
+    client  = razorpay.Client(auth=("rzp_test_aVR1IKDghGVJcq", "MIdgCBvppW3DYwzXqIgRNjcd"))
+
     Data = cartData(request)
     cartItems = Data['cartItems']
     order = Data['order']
     items = Data['items']
+    print('order:',order)
+    if request.user.is_authenticated:
+        total = int(order.get_cart_total*100)
+    else:
+        total = int(order['get_cart_total']*100)
+    # toal = order.get_cart_total
+    order_amount = total
+    order_currency = 'USD'
+    order_receipt = 'order_rcptid_11'
+    
+    response = client.order.create(dict(amount=order_amount, currency=order_currency, receipt=order_receipt,payment_capture = 0) )
 
-    context = {'items': items, 'order':order, 'cartItems':cartItems}
+    print(response)
+    order_id = response['id']
+    order_status = response['status']
+    context = {'items': items, 'order':order, 'cartItems':cartItems, 'order_id':order_id,'c':c}
     return render(request, 'store/checkout.html', context)
 
 
@@ -336,3 +371,59 @@ def product(request, pk):
 
 
  return render(request, 'store/product.html', context)
+
+def orders(request):
+    customer = request.user.customer
+    print(customer)
+    order = Order.objects.filter(customer = customer)
+    print(order[0])
+    orderitems = OrderItem.objects.filter(order = order[0])
+    print(orderitems[0].product.name)
+    print(orderitems[0].product.price)
+    print(orderitems[0].quantity)
+
+    items = []
+
+    for i in order:
+        details = OrderItem.objects.filter(order = i)
+        print('details:',details)
+        for j in details:
+            print('j:',j.product)
+            items.append(j)
+    
+    for k in items:
+        print('items:',k)
+        print('name:',k.product.name)
+        print('price:',k.product.price)
+        print('quantity:',k.quantity)
+        print('date:',k.order.date_ordered)
+    
+
+
+    if request.user.is_authenticated:
+        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        # items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+        context = {'cartItems':cartItems}
+    else:
+        try:
+            cart = json.loads(request.COOKIES['cart'])
+        except:
+            cart = {}
+            print('cart:', cart)  
+            items = []
+        order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
+        cartItems = order['get_cart_items']
+        for i in cart:
+            cartItems += cart[i]['quantity']   
+        
+    context = {'cartItems':cartItems,'items':items}
+ 
+
+    return render(request, 'store/orders.html', context)
+
+# Admin's section
+
+def admin_login(request):
+
+    return render(request, 'store/admin_login.html')

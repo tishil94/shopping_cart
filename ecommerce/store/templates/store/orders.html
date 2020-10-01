@@ -2,6 +2,8 @@
 {% load static %}
 {% block content %}
 
+<h1>Purchased items</h1>
+
 
 <div class="row" >
     
@@ -11,7 +13,7 @@
             <a class="btn btn-outline-dark" href="{% url 'store' %}">&#x2190; Continue shopping</a>
             <br>
             <br>
-            <table class="table" >
+            <!-- <table class="table" >
                 <tr>
                     <th><h5>Items: <strong>{{order.get_cart_items}}</strong></h5></th>
                     <th><h5>Total: <strong>${{order.get_cart_total|floatformat:2}}</strong></h5></th>
@@ -21,7 +23,7 @@
                     
                 </tr>
 
-            </table>
+            </table> -->
 
         </div>
 
@@ -31,9 +33,9 @@
             <div class="cart-row" >
                 <div style="flex:2" ></div>
                 <div style="flex:2" ><strong>Item</strong></div>
-                <div style="flex:1" ><strong>Price</strong></div>
                 <div style="flex:1" ><strong>Quantity</strong></div>
-                <div style="flex:1" ><strong>Total</strong></div>
+                <div style="flex:1" ><strong>Total price</strong></div>
+                <div style="flex:1" ><strong>Date Ordered</strong></div>
 
             </div>
 
@@ -43,16 +45,13 @@
             <div class="cart-row" >
                 <div style="flex:2" ><img class="row-image" src="{{item.product.imageURL}}" alt=""></div>
                 <div style="flex:2" >{{item.product.name}}</div>
-                <div style="flex:1" >${{item.product.price|floatformat:2}}</div>
+               
                 <div style="flex:1" >
                     <p class="quantity" >{{item.quantity}}</p>
-                    <div class="quantity" >
-
-                        <img data-product="{{item.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static 'images/arrow-up.png' %}" alt="">
-                        <img data-product="{{item.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static 'images/arrow-down.png' %}" alt="">
-                    </div>
+ 
                 </div>
                 <div style="flex:1" >${{item.get_total}}</div>
+                <div style="flex:1" >{{item.order.date_ordered}}</div>
 
             </div>
 
@@ -65,9 +64,5 @@
     </div>
 
 </div>
-
-
-
-
 
 {% endblock content %}
