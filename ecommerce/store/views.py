@@ -11,6 +11,8 @@ from django.contrib.auth.models import User,auth
 from . utils import cookieCart, cartData, guestOrder
 import requests
 import razorpay
+from django.core.files.storage import FileSystemStorage
+from datetime import *
 
 # Create your views here.
 
@@ -304,7 +306,7 @@ def updateItem(request):
 
 def processOrder(request):
 
-    transaction_id = datetime.datetime.now().timestamp()
+    transaction_id = datetime.now().timestamp()
     data = json.loads(request.body)
 
     if request.user.is_authenticated:
@@ -376,7 +378,7 @@ def orders(request):
     customer = request.user.customer
     print(customer)
     order = Order.objects.filter(customer = customer)
-    print(order[0])
+    print('total:',order[0])
     orderitems = OrderItem.objects.filter(order = order[0])
     print(orderitems[0].product.name)
     print(orderitems[0].product.price)
@@ -425,5 +427,145 @@ def orders(request):
 # Admin's section
 
 def admin_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        if username == "tishil" and password =="1234":
+            user = auth.authenticate(request, username = username, password = password)
+
+            if user is not None:
+                auth.login(request,user)
+                return redirect('admin_home')
+            else:
+                messages.info(request, 'Invalid credentials')
+                return render(request, 'store/admin_login.html')
+        messages.info(request, 'Invalid credentials')
+        return render(request, 'store/admin_login.html')
 
     return render(request, 'store/admin_login.html')
+
+def admin_logout(request):
+    auth.logout(request)
+    return redirect('admin_login')
+
+
+def admin_home(request):
+
+    year = datetime.now().year
+    month = datetime.now().month
+    print(month)
+    chart_order = Order.objects.filter(date_ordered__year = year,date_ordered__month = month)
+    print(chart_order[0].get_cart_total)
+
+    chart_values = []
+    
+    for i in range(0,6):
+        chart_order = Order.objects.filter(date_ordered__year = year,date_ordered__month = month-5+i)
+        order_total = 0
+        for items in chart_order:
+            try:
+                order_total += round(items.get_cart_total,2)
+            except:
+                order_total += 0
+        chart_values.append(round(order_total,2))        
+    print(chart_values)
+
+    orders = Order.objects.all()
+    total = 0
+    for order in orders:
+        try:
+            order_total = order.get_cart_total
+        except:
+            order_total = 0
+        total = total + order_total
+    
+    print('total',round(total,2))
+
+    customer = Customer.objects.count()
+    product = Product.objects.count()
+    order_count = Order.objects.count()
+
+    context ={'customer':customer,'product':product,'order_count':order_count,'total':total,'chart_values':chart_values}
+
+    return render(request,"admin/home_content.html", context)
+
+def product_view(request):
+    products = Product.objects.all()
+    context = {'products':products}
+    return render(request,"admin/product_view.html", context)
+
+def add_product(request):
+    if request.method == 'POST':
+
+        name = request.POST['name']
+        price = request.POST['price']
+        product_type = request.POST['product_type']
+        image=request.FILES.get('myfile')
+
+        item = Product(name = name,price = price, digital = product_type, image = image)
+        item.save();
+
+        products = Product.objects.all()
+        context = {'products':products}
+        return render(request,"admin/product_view.html", context)
+    return render(request,"admin/add_product.html")
+    
+
+def update_product(request,id):
+    print(id)
+    product = Product.objects.get(id = id)
+    print('product:',product.name)
+    context = {'products':product}
+    if request.method == 'POST':
+        name = request.POST['name']
+        price = request.POST['price']
+        product_type = request.POST['product_type']
+        image=request.FILES.get('myfile')
+      
+        product.name = name
+        product.price = price
+        product.digital = product_type
+        # product.image = image
+        product.save();
+        
+        return redirect('product_view')
+    else:
+        
+        return render(request,"admin/update_product.html",{'product':product})
+    
+
+def delete_product(request,id):
+    product = Product.objects.get(id = id)
+    product.delete()
+    return redirect('product_view')
+
+
+def orders_view(request):
+    orders = Order.objects.all()
+    
+    context = {'orders':orders}
+    return render(request,"admin/orders_view.html", context)
+
+def orderitems_view(request):
+    orderitems = OrderItem.objects.all()
+    
+    context = {'orderitems':orderitems}
+    return render(request,"admin/orderitems_view.html", context)
+
+def shipping_view(request):
+    shipping = ShippingAdress.objects.all()
+    
+    context = {'shipping':shipping}
+    return render(request,"admin/shipping_view.html", context)
+
+def users_view(request):
+    users = User.objects.all()
+    print(users)
+    context = {'users':users}
+    return render(request,"admin/users_view.html", context)
+
+def customer_view(request):
+    customers = Customer.objects.all()
+    context = {'customers':customers}
+    print(customers)
+    return render(request,"admin/customer_view.html", context)

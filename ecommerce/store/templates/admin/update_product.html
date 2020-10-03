@@ -1,0 +1,122 @@
+
+{% extends 'admin/base_template.html' %}
+{% block page_title %}
+Update your Product
+{% endblock page_title %}
+{% block main_content %}
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://kit.fontawesome.com/c0d12c7483.js" crossorigin="anonymous"></script>
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="container">
+	<div class="row">
+	<form class="form-horizontal" action="{%url 'update_product' product.id %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+
+            <!-- Form Name -->
+
+
+            <!-- Text input-->
+                    <div class="control-group">
+                    <label class="control-label" for="full_name">Product Name</label>
+                    <div class="controls">
+                        <input required = True id="full_name" name="name" placeholder="Productname" class="input-xlarge" type="text" value="{{product.name}}" >
+                        <p class="help-block"></p>
+                    </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="course">Digital</label>
+                        <div class="controls">
+                        <select id="course" name="product_type" class="input-xlarge">
+                            <option>{{product.digital}}</option>
+                            <option>False</option>
+                            <option>True</option>
+                        
+                        </select>
+                        </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="control-group">
+                    <label class="control-label" >Price</label>
+                    <div class="controls">
+                        <input required = True id="mother_name" name="price" placeholder="price" class="input-xlarge" type="text" value="{{product.price}}" >
+                        <p class="help-block"></p>
+                    </div>
+                    </div>
+
+
+                    <!-- File Button --> 
+                    <div class="control-group">
+                    <label class="control-label" for="photo">Product Image</label>
+                    <div class="controls">
+                        <input   name="myfile" class="input-file" type="file" src="{{product.imageURL}}" value="{{product.imageURL}}" >
+                    </div>
+                    </div>
+
+            <!-- Button -->
+                <div class="control-group">
+                <label class="control-label" for="submit"></label>
+                <div class="controls">
+                    <button type="submit" class="btn btn-info btn-lg" data-toggle="modal" data-target="">Save</button>
+                
+                </div>
+
+
+
+
+
+
+                <div id="myModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                    
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-3 ml-auto">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                    
+                            </div>
+                            <div class="modal-body">
+                            <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-3 ml-auto">
+                                <p >saved successfully <span style="color: blue; " ><i class="fas fa-check indigo-text pr-3"></i></span></p>
+                                
+                                </div>
+                            </div>
+                            </div>
+                            </div>
+                    
+                        </div>
+                        <div class="modal-footer">
+                            <div class="text-center">
+                        <button type="button" class="btn btn-primary " data-dismiss="modal">ok</button>
+                        </div>
+                        </div>
+                </div>
+            
+                </div>
+            </div>
+
+                        
+            </div>
+        </fieldset>
+    </form>
+
+    </div>
+</div>
+
+{% endblock main_content %}

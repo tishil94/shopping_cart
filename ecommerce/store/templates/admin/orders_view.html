@@ -1,0 +1,53 @@
+{% extends 'admin/base_template.html' %}
+{% block page_title %}
+Orders
+{% endblock page_title %}
+{% block main_content %}
+
+
+
+<div class="row" >
+    
+    <div class="col-lg-12">
+
+
+   
+
+        <div style="margin-left: 1em;  " class="box-element" >
+            <div class="cart-row"  >
+                <div style="flex:1  " ><strong> Order Id</strong></div>
+                <div style="flex:1  " ><strong> Customer</strong></div>
+                <div style="flex:1" ><strong>Date </strong></div>
+                <div style="flex:1  " ><strong>Payment status</strong></div>
+                <div style="flex:1" ><strong></strong></div>
+                
+
+            </div>
+
+
+
+            {% for order in orders %}
+            <div class="cart-row" >
+                <div style="flex:1" >{{order.id}}</div>
+                <div style="flex:1" >{{order.customer}}</div>
+            
+                <div style="flex:1  " >{{order.date_ordered}}</div>
+               
+                <div style="flex:1" >{{order.complete}}</div>
+                <div style="flex:1" ><a href="#"class="btn btn-info rounded ">Edit</a></div>
+            
+            </div>
+            
+            {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+{% endblock main_content %}
