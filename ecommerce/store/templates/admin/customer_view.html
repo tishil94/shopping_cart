@@ -20,18 +20,22 @@ Customers
                 
                 <div style="flex:1" ><strong>User</strong></div>
                 <div style="flex:1" ><strong>email</strong></div>
+                <div style="flex:1" ><strong>Orders</strong></div>
+
 
             </div>
 
 
 
-            {% for customer in customers %}
+            {% for customer,items in data %}
             <div class="cart-row" >
                 <div style="flex:1" >{{customer.name}}</div>
             
                 <div style="flex:1" >{{customer.user}}</div>
                
                 <div style="flex:1" > {{customer.email}}</div>
+
+                <div style="flex:1" > {{items}}</div>
                
             
             </div>

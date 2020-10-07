@@ -18,7 +18,7 @@ Orders
                 <div style="flex:1  " ><strong> Order Id</strong></div>
                 <div style="flex:1  " ><strong> Customer</strong></div>
                 <div style="flex:1" ><strong>Date </strong></div>
-                <div style="flex:1  " ><strong>Payment status</strong></div>
+                <div style="flex:1  " ><strong>Order Status</strong></div>
                 <div style="flex:1" ><strong></strong></div>
                 
 
@@ -27,17 +27,36 @@ Orders
 
 
             {% for order in orders %}
+            <form action="{% url 'update_order_status' order.id %}" method="POST" >
+            {% csrf_token %}
             <div class="cart-row" >
                 <div style="flex:1" >{{order.id}}</div>
                 <div style="flex:1" >{{order.customer}}</div>
             
                 <div style="flex:1  " >{{order.date_ordered}}</div>
                
-                <div style="flex:1" >{{order.complete}}</div>
-                <div style="flex:1" ><a href="#"class="btn btn-info rounded ">Edit</a></div>
-            
+                <!-- <div style="flex:1" >{{order.order_status}}</div> -->
+
+                <div style="flex:1" >
+                    <select name="status" id="">
+                        <option>{{order.order_status}}</option>
+                        <option>Pending</option>
+                        <option>Completed</option>
+                        <option>Out for delivery</option>
+
+                        
+
+
+                    </select>
+                
+                
+                </div>
+
+
+                <div style="flex:1"  ><button type="submit" class="btn btn-primary rounded" >Update</button></div>
+                
             </div>
-            
+            </form>
             {% endfor %}
 
 

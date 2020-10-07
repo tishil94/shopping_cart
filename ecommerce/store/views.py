@@ -13,6 +13,13 @@ import requests
 import razorpay
 from django.core.files.storage import FileSystemStorage
 from datetime import *
+from django.contrib.auth.decorators import login_required
+import base64
+from PIL import Image
+from base64 import decodestring
+import binascii
+from django.core.files import File
+from django.core.files.base import ContentFile
 
 # Create your views here.
 
@@ -189,7 +196,9 @@ def register(request):
                 user = User.objects.create_user(username = username, password = password1, email = email,first_name = password1, last_name = mobile)
                 user.save();
                 print('User created')
-                return redirect('login')
+                responce = redirect('otp')
+                responce.set_cookie('mobile', mobile)
+                return responce
                 
         else:
             messages.info(request, 'password not matching')       
@@ -249,8 +258,9 @@ def checkout(request):
 
     response = requests.request("GET", url, headers=headers)
 
-    c = json.loads(response.text)
-    print(c[0]["name"])
+    countries = json.loads(response.text)
+    print(countries[8]['name'])
+    print(countries[8]["callingCodes"])
 
     client  = razorpay.Client(auth=("rzp_test_aVR1IKDghGVJcq", "MIdgCBvppW3DYwzXqIgRNjcd"))
 
@@ -267,14 +277,16 @@ def checkout(request):
     order_amount = total
     order_currency = 'USD'
     order_receipt = 'order_rcptid_11'
-    
-    response = client.order.create(dict(amount=order_amount, currency=order_currency, receipt=order_receipt,payment_capture = 0) )
+    if order_amount == 0:
+        return redirect('cart')
+    else:
+        response = client.order.create(dict(amount=order_amount, currency=order_currency, receipt=order_receipt,payment_capture = 0) )
 
-    print(response)
-    order_id = response['id']
-    order_status = response['status']
-    context = {'items': items, 'order':order, 'cartItems':cartItems, 'order_id':order_id,'c':c}
-    return render(request, 'store/checkout.html', context)
+        print(response)
+        order_id = response['id']
+        order_status = response['status']
+        context = {'items': items, 'order':order, 'cartItems':cartItems, 'order_id':order_id,'c':countries}
+        return render(request, 'store/checkout.html', context)
 
 
 
@@ -313,6 +325,11 @@ def processOrder(request):
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer = customer, complete = False)
 
+        country = data['shipping']['country']
+        countrycode = CountryCodes.objects.get(country = country)
+        code = countrycode.code
+        print(code)
+
         if order.shipping == True:
             ShippingAdress.objects.create(
 
@@ -321,7 +338,10 @@ def processOrder(request):
                 address = data['shipping']['address'],
                 city = data['shipping']['city'],
                 state = data['shipping']['state'],
-                zipcode = data['shipping']['zipcode']
+                zipcode = data['shipping']['zipcode'],
+                country = code
+
+                
             )
         
     else:
@@ -333,6 +353,11 @@ def processOrder(request):
     if total == order.get_cart_total:
         order.complete = True
     order.save()
+    
+    country = data['shipping']['country']
+    countrycode = CountryCodes.objects.get(country = country)
+    code = countrycode.code
+    print(code)
 
     if order.shipping == True:
         ShippingAdress.objects.create(
@@ -342,7 +367,9 @@ def processOrder(request):
             address = data['shipping']['address'],
             city = data['shipping']['city'],
             state = data['shipping']['state'],
-            zipcode = data['shipping']['zipcode']
+            zipcode = data['shipping']['zipcode'],
+            country = code
+
             )
 
     print('Data:',request.body)
@@ -377,30 +404,19 @@ def product(request, pk):
 def orders(request):
     customer = request.user.customer
     print(customer)
-    order = Order.objects.filter(customer = customer)
-    print('total:',order[0])
-    orderitems = OrderItem.objects.filter(order = order[0])
-    print(orderitems[0].product.name)
-    print(orderitems[0].product.price)
-    print(orderitems[0].quantity)
+    order = Order.objects.filter(customer = customer,complete=True)
+   
+
 
     items = []
 
     for i in order:
-        details = OrderItem.objects.filter(order = i)
+        details = OrderItem.objects.filter(order = i,product__isnull=False)
         print('details:',details)
         for j in details:
             print('j:',j.product)
             items.append(j)
     
-    for k in items:
-        print('items:',k)
-        print('name:',k.product.name)
-        print('price:',k.product.price)
-        print('quantity:',k.quantity)
-        print('date:',k.order.date_ordered)
-    
-
 
     if request.user.is_authenticated:
         order, created = Order.objects.get_or_create(customer = customer, complete = False)
@@ -448,7 +464,7 @@ def admin_logout(request):
     auth.logout(request)
     return redirect('admin_login')
 
-
+@login_required(login_url='/admin_login/')
 def admin_home(request):
 
     year = datetime.now().year
@@ -489,28 +505,40 @@ def admin_home(request):
 
     return render(request,"admin/home_content.html", context)
 
+
+@login_required(login_url='/admin_login/')
 def product_view(request):
     products = Product.objects.all()
     context = {'products':products}
     return render(request,"admin/product_view.html", context)
 
+
+@login_required(login_url='/admin_login/')
 def add_product(request):
     if request.method == 'POST':
 
         name = request.POST['name']
         price = request.POST['price']
         product_type = request.POST['product_type']
-        image=request.FILES.get('myfile')
+        image_data =request.POST['image64data']
+        print('data', image_data)
+        value = image_data.strip('data:image/png;base64,')
+        
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
 
-        item = Product(name = name,price = price, digital = product_type, image = image)
+        data = ContentFile(base64.b64decode(imgstr),name='temp.' + ext)
+
+        item = Product(name = name,price = price, digital = product_type, image = data)
         item.save();
-
+     
         products = Product.objects.all()
         context = {'products':products}
         return render(request,"admin/product_view.html", context)
     return render(request,"admin/add_product.html")
-    
 
+
+@login_required(login_url='/admin_login/')
 def update_product(request,id):
     print(id)
     product = Product.objects.get(id = id)
@@ -525,7 +553,11 @@ def update_product(request,id):
         product.name = name
         product.price = price
         product.digital = product_type
-        # product.image = image
+    
+        if 'myfile' not in request.POST:
+            product.image=request.FILES['myfile']
+        else:
+            product.image = product.image   
         product.save();
         
         return redirect('product_view')
@@ -534,38 +566,68 @@ def update_product(request,id):
         return render(request,"admin/update_product.html",{'product':product})
     
 
+@login_required(login_url='/admin_login/')
 def delete_product(request,id):
     product = Product.objects.get(id = id)
     product.delete()
     return redirect('product_view')
 
 
+@login_required(login_url='/admin_login/')
 def orders_view(request):
     orders = Order.objects.all()
     
     context = {'orders':orders}
     return render(request,"admin/orders_view.html", context)
 
+
+@login_required(login_url='/admin_login/')
 def orderitems_view(request):
-    orderitems = OrderItem.objects.all()
+    orderitems = OrderItem.objects.filter(product__isnull=False)
     
     context = {'orderitems':orderitems}
     return render(request,"admin/orderitems_view.html", context)
 
+
+@login_required(login_url='/admin_login/')
+def update_order_status(request,id):
+    print(id)
+    stat = request.POST['status']
+    order = Order.objects.get(id = id)
+    order.order_status = stat
+    order.save();
+
+    return redirect('orders_view')
+
+@login_required(login_url='/admin_login/')
 def shipping_view(request):
     shipping = ShippingAdress.objects.all()
     
     context = {'shipping':shipping}
     return render(request,"admin/shipping_view.html", context)
 
+
+@login_required(login_url='/admin_login/')
 def users_view(request):
     users = User.objects.all()
     print(users)
     context = {'users':users}
     return render(request,"admin/users_view.html", context)
 
+
+@login_required(login_url='/admin_login/')
 def customer_view(request):
     customers = Customer.objects.all()
-    context = {'customers':customers}
+
+    items = []
+
+    for customer in customers:
+        order = Order.objects.filter(customer = customer,complete = True)
+        value = order.count()
+        items.append(value)
+    
+    data = zip(customers,items)
+
+    
     print(customers)
-    return render(request,"admin/customer_view.html", context)
+    return render(request,"admin/customer_view.html", {'data':data})
