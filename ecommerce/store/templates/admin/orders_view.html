@@ -27,36 +27,50 @@ Orders
 
 
             {% for order in orders %}
-            <form action="{% url 'update_order_status' order.id %}" method="POST" >
-            {% csrf_token %}
+         
             <div class="cart-row" >
                 <div style="flex:1" >{{order.id}}</div>
                 <div style="flex:1" >{{order.customer}}</div>
             
                 <div style="flex:1  " >{{order.date_ordered}}</div>
                
-                <!-- <div style="flex:1" >{{order.order_status}}</div> -->
-
                 <div style="flex:1" >
-                    <select name="status" id="">
-                        <option>{{order.order_status}}</option>
-                        <option>Pending</option>
-                        <option>Completed</option>
-                        <option>Out for delivery</option>
 
-                        
-
-
-                    </select>
                 
-                
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-light">{{order.order_status}}</button>
+                        <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                      
+                        <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                            <div class="dropdown-menu">
+                                {% if order.order_status == 'Pending' %}
+                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Out for delivery' %}">out for delivery</a>
+                                    <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
+                                {%endif%}
+                           
+                                {%if order.order_status == 'Out for delivery' %}
+                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
+                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
+                                    {%endif%}
+                                {%if order.order_status == 'Completed' %}
+                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
+                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">out for delivery</a>
+                                {%endif%}
+                            </div>
+                    </div>
+
                 </div>
+                
+                
+               
 
 
-                <div style="flex:1"  ><button type="submit" class="btn btn-primary rounded" >Update</button></div>
+                
                 
             </div>
-            </form>
+            
             {% endfor %}
 
 

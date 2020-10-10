@@ -130,8 +130,8 @@ img {
                                 <!-- save btn -->
                                 <button class="btn save hide">Confirm</button>
                                 <!-- download btn -->
-                                <a href="" id="" class="btn hidden">pload</a>
-                                <button id="load" class="btn btn primary" type="button" >Upload</button>
+                                <a href="" id="" class="btn hidden"></a>
+                                <button id="load" class="  btn btn primary" type="button" >Upload</button>
                             </div>
                         </main>
 
@@ -144,7 +144,7 @@ img {
                 <div class="control-group">
                 <label class="control-label" for="submit"></label>
                 <div class="controls">
-                    <button type="submit" class="btn btn-info btn-lg" data-toggle="modal" data-target="">Save</button>
+                    <button type="submit" class="btn btn-danger btn-lg" data-toggle="modal" data-target="">Save</button>
                 
                 </div>
 
@@ -262,12 +262,12 @@ save.addEventListener('click',(e)=>{
     var button = document.getElementById('load');
     button.addEventListener('click',function(){
         setImageData();
-        console.log('Clicked')
+        console.log('Cropped')
     })
     
 
     function setImageData(){
-        alert('clicked')
+        
         var imageElement = document.getElementById('cropped');
         var imageData = imageElement.src;
         var hiddenElement = document.getElementById("imageBaseData");

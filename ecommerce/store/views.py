@@ -273,7 +273,7 @@ def checkout(request):
         total = int(order.get_cart_total*100)
     else:
         total = int(order['get_cart_total']*100)
-    # toal = order.get_cart_total
+    
     order_amount = total
     order_currency = 'USD'
     order_receipt = 'order_rcptid_11'
@@ -420,7 +420,7 @@ def orders(request):
 
     if request.user.is_authenticated:
         order, created = Order.objects.get_or_create(customer = customer, complete = False)
-        # items = order.orderitem_set.all()
+        
         cartItems = order.get_cart_items
         context = {'cartItems':cartItems}
     else:
@@ -589,12 +589,12 @@ def orderitems_view(request):
     return render(request,"admin/orderitems_view.html", context)
 
 
-@login_required(login_url='/admin_login/')
-def update_order_status(request,id):
+
+def update_order_status(request,id,order_status):
     print(id)
-    stat = request.POST['status']
+    
     order = Order.objects.get(id = id)
-    order.order_status = stat
+    order.order_status = order_status
     order.save();
 
     return redirect('orders_view')
