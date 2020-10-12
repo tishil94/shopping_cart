@@ -12,8 +12,7 @@ urlpatterns = [
     path('otp/', views.otp, name = "otp"),
     path('mobile/', views.mobile, name = "mobile"),
     path('orders/', views.orders, name = "orders"),
-    
-  
+     
     path('update_item/', views.updateItem, name = "update_item"),
     path('process_order/', views.processOrder, name = "process_order"),
 

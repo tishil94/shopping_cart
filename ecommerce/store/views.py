@@ -350,7 +350,7 @@ def processOrder(request):
     total = float(data['form']['total'])
     order.transaction_id = transaction_id
 
-    if total == order.get_cart_total:
+    if round(total,2) == round(order.get_cart_total,2):
         order.complete = True
     order.save()
     

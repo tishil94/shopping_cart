@@ -47,7 +47,7 @@ Orders
                                 {% if order.order_status == 'Pending' %}
                                     <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Out for delivery' %}">out for delivery</a>
                                     <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
+                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
                                 {%endif%}
                            
                                 {%if order.order_status == 'Out for delivery' %}
