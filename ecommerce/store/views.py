@@ -31,7 +31,7 @@ def otp(request):
         user = User.objects.filter(last_name = phone).exists()
         print(user)
         if not user:
-            messages.info(request,'Mobile number invalid')
+            messages.info(request,'The mobile number is not registered')
             return redirect('mobile')
             
         url = "https://d7networks.com/api/verifier/send"
