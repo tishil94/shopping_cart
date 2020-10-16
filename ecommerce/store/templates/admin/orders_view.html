@@ -45,18 +45,18 @@ Orders
                         </button>
                             <div class="dropdown-menu">
                                 {% if order.order_status == 'Pending' %}
-                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Out for delivery' %}">out for delivery</a>
+                                    <a class="dropdown-item"  id="status1" href="{% url 'update_order_status' id=order.id order_status='Out for delivery' %}">out for delivery</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
+                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
                                 {%endif%}
                            
                                 {%if order.order_status == 'Out for delivery' %}
-                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
-                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
+                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
+                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
                                     {%endif%}
                                 {%if order.order_status == 'Completed' %}
-                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
-                                    <a class="dropdown-item" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">out for delivery</a>
+                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
+                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='out for delivery' %}">out for delivery</a>
                                 {%endif%}
                             </div>
                     </div>

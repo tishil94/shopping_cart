@@ -12,7 +12,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{% static 'dist/img/icons.png' %}" class="img-circle elevation-2" alt="User Image">
+          <img src="{% static 'dist/img/avatar5.png' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
           <a href="#" class="d-block">{{ user.username }}</a>
@@ -27,7 +27,7 @@
           <li class="nav-item">
                 {% url 'admin_home' as admin_home %}
                 <a href="{{ admin_home }}" class="nav-link {% if request.path == admin_home %} active {% endif %}">
-                  <i class="nav-icon fas fa-th"></i>
+                  <i class="nav-icon fas fa-home"></i>
                   <p>
                    Dashboard
                    
@@ -39,7 +39,7 @@
                 {% url 'users_view' as users_view %}
                 {% url 'edit_department' department_id=id as edit_department %}
                 <a href="{% url 'users_view' %}" class="nav-link {% if request.path == users_view %} active {% endif %} {% if request.path == edit_department %} active {% endif %}">
-                  <i class="nav-icon fas fa-th"></i>
+                  <i class="nav-icon fas fa-user-circle"></i>
                   <p>
                     Users
                   </p>
@@ -49,7 +49,7 @@
             {% url 'customer_view' as customer_view %}
             {% url 'edit_department' department_id=id as edit_department %}
             <a href="{% url 'customer_view' %}" class="nav-link {% if request.path == customer_view %} active {% endif %} {% if request.path == edit_department %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-users"></i>
               <p>
                 Customers
               </p>
@@ -60,7 +60,7 @@
             {% url 'product_view' as product_view %}
             {% url 'edit_department' department_id=id as edit_department %}
             <a href="{% url 'product_view' %}" class="nav-link {% if request.path == product_view %} active {% endif %} {% if request.path == edit_department %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-box-open"></i>
               <p>
                 Products
               </p>
@@ -71,7 +71,7 @@
             {% url 'orders_view' as orders_view %}
             {% url 'edit_employees' employee_id=id as edit_employees %}
             <a href="{% url 'orders_view' %}" class="nav-link {% if request.path == orders_view %} active {% endif %} {% if request.path == edit_employees %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-shipping-fast"></i>
               <p>
                 Orders
               </p>
@@ -82,7 +82,7 @@
             {% url 'orderitems_view' as orderitems_view %}
             {% url 'edit_departmentname' departmentname_id=id as edit_departmentname %}
             <a href="{% url 'orderitems_view' %}" class="nav-link {% if request.path == orderitems_view %} active {% endif %} {% if request.path == edit_departmentname %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fas fa-shopping-cart"></i>
               <p>
                 OrderItems
               </p>
