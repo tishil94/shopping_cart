@@ -600,6 +600,18 @@ def update_order_status(request,id,order_status):
 
     return redirect('orders_view')
 
+
+def update_order(request):
+    id = request.POST.get('order_id')
+    status = request.POST.get('order_status')
+    print(id)
+
+    order = Order.objects.get(id = id)
+    order.order_status = status
+    order.save();
+
+    return redirect('orders_view')
+
 @login_required(login_url='/admin_login/')
 def shipping_view(request):
     shipping = ShippingAdress.objects.all()

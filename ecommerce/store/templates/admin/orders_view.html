@@ -36,30 +36,33 @@ Orders
                
                 <div style="flex:1" >
 
-                
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-light">{{order.order_status}}</button>
-                        <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                      
-                        <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                            <div class="dropdown-menu">
-                                {% if order.order_status == 'Pending' %}
-                                    <a class="dropdown-item"  id="status1" href="{% url 'update_order_status' id=order.id order_status='Out for delivery' %}">out for delivery</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
+                <div class="btn-group">
+                    <button type="button" class="actual_status" class=" btn btn-light">{{order.order_status}}</button>
+                    <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                
+                    <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                        <div class="dropdown-menu">
+                            {% if order.order_status == 'Pending' %}
+                                
+                                <button data-id="{{order.id}}"  data-status="Out for delivery" class=" change_status dropdown-item" >out for delivery</button>
+                                
+                                <button  data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" >completed</button>
+                            {%endif%}
+                    
+                            {%if order.order_status == 'Out for delivery' %}
+                            <button data-id="{{order.id}}"  data-status="Pending" class=" change_status dropdown-item" >pending</button>
+                                
+                            <button  data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" >completed</button>
                                 {%endif%}
-                           
-                                {%if order.order_status == 'Out for delivery' %}
-                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
-                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Completed' %}">completed</a>
-                                    {%endif%}
-                                {%if order.order_status == 'Completed' %}
-                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='Pending' %}">pending</a>
-                                    <a class="dropdown-item" id="status1" href="{% url 'update_order_status' id=order.id order_status='out for delivery' %}">out for delivery</a>
-                                {%endif%}
-                            </div>
-                    </div>
+                            {%if order.order_status == 'Completed' %}
+                            <button data-id="{{order.id}}"  data-status="Out for delivery" class=" change_status dropdown-item" >out for delivery</button>
+                                
+                            <button  data-id="{{order.id}}"  data-status="Pending" class=" change_status dropdown-item" >pending</button>
+                            {%endif%}
+                        </div>
+                </div>
+
 
                 </div>
                 
@@ -80,7 +83,92 @@ Orders
     </div>
 
 </div>
+<script>
 
+     
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  var csrftoken = getCookie('csrftoken');
+
+    /*var btn = document.getElementById('order_status1')
+    btn.addEventListener('click',function(){
+
+        alert('ok')
+        var top = document.getElementById('actual_status')
+        top.innerHTML = 'changed'
+    })*/
+    var statusBtns = document.getElementsByClassName('change_status')
+
+    for(var i = 0; i < statusBtns.length; i++){
+        statusBtns[i].addEventListener('click', function(){
+        var orderId = this.dataset.id
+        var status = this.dataset.status
+        console.log('orderId:', orderId, 'status :', status)
+        var top = document.getElementsByClassName('actual_status')
+        top[orderId-1].innerHTML = status
+        
+        
+        $.ajax({
+            url: '/update_order/',
+            type: 'post',
+            data: {
+              order_id: orderId,
+              order_status:status,
+              csrfmiddlewaretoken: csrftoken
+            },
+
+        });
+
+
+        })
+    }
+
+
+</script>
 
 
 {% endblock main_content %}
+
+
+
+
+<!-- 
+
+<button id="order_status1" >check</button>
+<select name="" id="">
+
+    <option id="actual_status" value="">{{order.order_status}}</option>
+
+    {% if order.order_status == 'Pending' %}
+    <option value=""><button id="order_status1"  class="btn btn-primary"  >out for delivery</button></option>
+    <option value=""><button id="order_status2" class="btn btn-primary"  >completed</button></option>
+
+    {%endif%}
+
+    {%if order.order_status == 'Out for delivery' %}
+    <option value=""><button  class="dropdown-item" id="" >pending</button></option>
+    <option value=""><button  class="dropdown-item" id="" >completed</button></option>
+    {%endif%}
+    {%if order.order_status == 'Completed' %}
+    <option value=""><button  class="dropdown-item" id="" >out for delivery</button></option>
+    <option value=""><button  class="dropdown-item" id="" >pending</button></option>
+    {%endif%}
+
+
+
+
+
+</select> -->
