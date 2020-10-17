@@ -601,6 +601,7 @@ def update_order_status(request,id,order_status):
     return redirect('orders_view')
 
 
+
 def update_order(request):
     id = request.POST.get('order_id')
     status = request.POST.get('order_status')
