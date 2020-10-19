@@ -1,25 +1,25 @@
 {% extends 'admin/base_template.html' %}
 {% block page_title %}
-Orders
+<h3 style="margin-left: 2em;" >Orders</h3>
 {% endblock page_title %}
 {% block main_content %}
 
 
 
-<div class="row" >
+<div style="padding-left: 1em;" class="row" >
     
     <div class="col-lg-12">
 
 
    
 
-        <div style="margin-left: 1em;  " class="box-element" >
+        <div style="  padding-left: 3em; margin-left: 1em; " class="box-element" >
             <div class="cart-row"  >
                 <div style="flex:1  " ><strong> Order Id</strong></div>
                 <div style="flex:1  " ><strong> Customer</strong></div>
                 <div style="flex:1" ><strong>Date </strong></div>
                 <div style="flex:1  " ><strong>Order Status</strong></div>
-                <div style="flex:1" ><strong></strong></div>
+                
                 
 
             </div>
@@ -118,7 +118,7 @@ function getCookie(name) {
         var status = this.dataset.status
         console.log('orderId:', orderId, 'status :', status)
         var top = document.getElementsByClassName('actual_status')
-        top[orderId-1].innerHTML = status
+        top[orderId-2].innerHTML = status
         
         
         $.ajax({
