@@ -20,6 +20,7 @@ from base64 import decodestring
 import binascii
 from django.core.files import File
 from django.core.files.base import ContentFile
+from django.contrib.auth.decorators import user_passes_test
 
 # Create your views here.
 
@@ -465,7 +466,7 @@ def admin_logout(request):
     auth.logout(request)
     return redirect('admin_login')
 
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def admin_home(request):
 
     year = datetime.now().year
@@ -507,14 +508,14 @@ def admin_home(request):
     return render(request,"admin/home_content.html", context)
 
 
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def product_view(request):
     products = Product.objects.all()
     context = {'products':products}
     return render(request,"admin/product_view.html", context)
 
 
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def add_product(request):
     if request.method == 'POST':
 
@@ -539,7 +540,7 @@ def add_product(request):
     return render(request,"admin/add_product.html")
 
 
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def update_product(request,id):
     print(id)
     product = Product.objects.get(id = id)
@@ -567,22 +568,21 @@ def update_product(request,id):
         return render(request,"admin/update_product.html",{'product':product})
     
 
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def delete_product(request,id):
     product = Product.objects.get(id = id)
     product.delete()
     return redirect('product_view')
 
 
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def orders_view(request):
     orders = Order.objects.all()
     
     context = {'orders':orders}
     return render(request,"admin/orders_view.html", context)
 
-
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def orderitems_view(request):
     orderitems = OrderItem.objects.filter(product__isnull=False)
     
@@ -620,8 +620,7 @@ def shipping_view(request):
     context = {'shipping':shipping}
     return render(request,"admin/shipping_view.html", context)
 
-
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def users_view(request):
     users = User.objects.all()
     print(users)
@@ -629,7 +628,7 @@ def users_view(request):
     return render(request,"admin/users_view.html", context)
 
 
-@login_required(login_url='/admin_login/')
+@user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def customer_view(request):
     customers = Customer.objects.all()
 

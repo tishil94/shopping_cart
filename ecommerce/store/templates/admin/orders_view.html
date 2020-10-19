@@ -118,7 +118,7 @@ function getCookie(name) {
         var status = this.dataset.status
         console.log('orderId:', orderId, 'status :', status)
         var top = document.getElementsByClassName('actual_status')
-        top[orderId-2].innerHTML = status
+        top[orderId-3].innerHTML = status
         
         
         $.ajax({
