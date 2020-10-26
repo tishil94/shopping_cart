@@ -69,7 +69,10 @@ class OrderItem(models.Model):
 
     @property   
     def get_total(self):
-        total = self.product.price * self.quantity
+        try:
+            total = self.product.price * self.quantity
+        except:
+            total = 0
         return total
 
 

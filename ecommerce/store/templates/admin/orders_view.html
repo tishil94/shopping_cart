@@ -14,10 +14,12 @@
    
 
         <div style="  padding-left: 3em; margin-left: 1em; " class="box-element" >
-            <div class="cart-row"  >
+            <div class="cart-row" >
                 <div style="flex:1  " ><strong> Order Id</strong></div>
                 <div style="flex:1  " ><strong> Customer</strong></div>
                 <div style="flex:1" ><strong>Date </strong></div>
+                <div style="flex:1" ><strong>Total </strong></div>
+
                 <div style="flex:1  " ><strong>Order Status</strong></div>
                 
                 
@@ -27,19 +29,30 @@
 
 
             {% for order in orders %}
-         
-            <div class="cart-row" >
+            {% if order.get_cart_total > 0 %}
+            <div class="cart-row" style="border-bottom: 0px; border-top: 1px solid ; padding-top: 10px;" >
                 <div style="flex:1" >{{order.id}}</div>
                 <div style="flex:1" >{{order.customer}}</div>
             
                 <div style="flex:1  " >{{order.date_ordered}}</div>
-               
+                <div style="flex:1  " >${{order.get_cart_total}}</div>
+
+             
+
+                
                 <div style="flex:1" >
 
-                <div class="btn-group">
-                    <button type="button" class="actual_status" class=" btn btn-light">{{order.order_status}}</button>
+                <div class="">
+                    {% if order.order_status == 'Pending' %}
+                    <button type="button" class="actual_status btn btn-info btn-md" class="actual_status btn btn-info btn-md">{{order.order_status}}</button>
                     <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                
+                    {% elif order.order_status == 'Out for delivery' %}
+                    <button type="button" class="actual_status btn btn-warning btn-md" class="actual_status btn btn-info btn-md">{{order.order_status}}</button>
+                    <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% elif order.order_status == 'Completed' %}
+                    <button type="button" class="actual_status btn btn-success btn-md" class="actual_status btn btn-info btn-md">{{order.order_status}}</button>
+                    <!-- <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> -->
+                    {%endif%}
                     <span class="sr-only">Toggle Dropdown</span>
                     </button>
                         <div class="dropdown-menu">
@@ -51,17 +64,17 @@
                             {%endif%}
                     
                             {%if order.order_status == 'Out for delivery' %}
-                            <button data-id="{{order.id}}"  data-status="Pending" class=" change_status dropdown-item" >pending</button>
                                 
                             <button  data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" >completed</button>
                                 {%endif%}
                             {%if order.order_status == 'Completed' %}
-                            <button data-id="{{order.id}}"  data-status="Out for delivery" class=" change_status dropdown-item" >out for delivery</button>
+                            <!-- <button  data-id="{{order.id}}"  data-status="Out for delivery" class=" change_status dropdown-item" >out for delivery</button>
                                 
-                            <button  data-id="{{order.id}}"  data-status="Pending" class=" change_status dropdown-item" >pending</button>
+                            <button  data-id="{{order.id}}"  data-status="Pending" class=" change_status dropdown-item" >pending</button> -->
                             {%endif%}
                         </div>
                 </div>
+                
 
 
                 </div>
@@ -73,11 +86,65 @@
                 
                 
             </div>
+             <div class="cart-row"  >
+                <div style="flex:1" ></div>            
+                <div style="flex:1" >ITEMS</div>               
+                <div style="flex:1" > Quantity</div>
+                <div style="flex:1" ></div>
+                <div style="flex:1" ></div>
+
+
+                
             
+            </div>
+            {% for item in order.orderitem_set.all %}
+            {%if item.product.name%}
+
+            <div class="cart-row" style="border-bottom: 0px;"  >
+                <div style="flex:.5" ></div>            
+                <div style="flex:2 ; padding-right:20px;" ><img class="row-image" src="{{item.product.imageURL}}" alt="">{{item.product.name}}</div>               
+                <div style="flex:1.5; padding-top:13px;" style="padding-top: 10px;" > X {{item.quantity}}</div>
+                <div style="flex:1" ></div>
+                <div style="flex:1" ></div>
+
+
+                
+            
+            </div>
+            {%endif%}
+
             {% endfor %}
+         
+            {%endif%} 
+            
+
+            {% endfor %}
+            
+         
 
 
         </div>
+        
+
+        <!-- Alternate table -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- table ends -->
+
+
+
+
 
 
     </div>
@@ -119,7 +186,7 @@ function getCookie(name) {
         console.log('orderId:', orderId, 'status :', status)
         var top = document.getElementsByClassName('actual_status')
         top[orderId-3].innerHTML = status
-        
+        window.location.reload()
         
         $.ajax({
             url: '/update_order/',

@@ -4,12 +4,19 @@ var updateBtns = document.getElementsByClassName('update-cart')
 
 for(var i = 0; i < updateBtns.length; i++){
     updateBtns[i].addEventListener('click', function(){
-    var val = document.getElementById("cart-total").textContent
-    val ++;
-    console.log('new cart', val)
-    document.getElementById("cart-total").innerHTML = val
+    
     var productId = this.dataset.product
     var action = this.dataset.action
+    var val = document.getElementById("cart-total").textContent
+    
+    if (action == 'add'){
+        val ++;
+    }else{
+        val --;
+    }
+    console.log('new cart', val)
+    document.getElementById("cart-total").innerHTML = val
+
     console.log('productId:', productId, 'action :', action)
 
     console.log('USER :', user)

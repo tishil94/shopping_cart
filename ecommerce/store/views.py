@@ -550,14 +550,14 @@ def update_product(request,id):
         name = request.POST['name']
         price = request.POST['price']
         product_type = request.POST['product_type']
-        image=request.FILES.get('myfile')
+        image=request.FILES.get('img')
       
         product.name = name
         product.price = price
         product.digital = product_type
     
-        if 'myfile' not in request.POST:
-            product.image=request.FILES['myfile']
+        if 'img' not in request.POST:
+            product.image=request.FILES.get('img')
         else:
             product.image = product.image   
         product.save();
@@ -578,7 +578,12 @@ def delete_product(request,id):
 @user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def orders_view(request):
     orders = Order.objects.all()
-    
+    orderitems = orders[0].orderitem_set.all()
+    print(orderitems[0].product)
+    print(orderitems[0].quantity)
+    print(orders[0].get_cart_total)
+    print(orders[0].orderitem_set.all()[0].product)
+  
     context = {'orders':orders}
     return render(request,"admin/orders_view.html", context)
 
@@ -593,6 +598,11 @@ def orderitems_view(request):
 
 def update_order_status(request,id,order_status):
     print(id)
+
+    com = Order.objects.get(order_status = "Complete")
+    print(com)
+    for c in com:
+        c.order_status = "Completed"
     
     order = Order.objects.get(id = id)
     order.order_status = order_status
@@ -605,7 +615,6 @@ def update_order_status(request,id,order_status):
 def update_order(request):
     id = request.POST.get('order_id')
     status = request.POST.get('order_status')
-    print(id)
 
     order = Order.objects.get(id = id)
     order.order_status = status
