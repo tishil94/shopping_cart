@@ -473,7 +473,7 @@ def admin_home(request):
     month = datetime.now().month
     print(month)
     chart_order = Order.objects.filter(date_ordered__year = year,date_ordered__month = month)
-    print(chart_order[0].get_cart_total)
+    
 
     chart_values = []
     
@@ -523,7 +523,7 @@ def add_product(request):
         price = request.POST['price']
         product_type = request.POST['product_type']
         image_data =request.POST['image64data']
-        print('data', image_data)
+        
         value = image_data.strip('data:image/png;base64,')
         
         format, imgstr = image_data.split(';base64,')
@@ -542,9 +542,9 @@ def add_product(request):
 
 @user_passes_test(lambda u: u.is_superuser,login_url='admin_login')
 def update_product(request,id):
-    print(id)
+    
     product = Product.objects.get(id = id)
-    print('product:',product.name)
+    
     context = {'products':product}
     if request.method == 'POST':
         name = request.POST['name']
